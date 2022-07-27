@@ -177,7 +177,7 @@ export default function BasicCard() {
             {response}
           </Typography>
         ) : (
-          <div></div>
+          <Typography component="div"></Typography>
         )}
       </CardContent>
     </Card>
