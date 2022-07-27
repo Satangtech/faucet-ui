@@ -1,3 +1,4 @@
+import * as React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
@@ -16,8 +17,14 @@ interface Token {
   error?: string;
 }
 
-export const ComboBox = () => {
+interface TokenName {
+  tokenName: string | null;
+  setTokenName: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export const ComboBox = ({ tokenName, setTokenName }: TokenName) => {
   const [tokens, setTokens] = useState<Token[]>([]);
+  const [inputValue, setInputValue] = React.useState("");
 
   useEffect(() => {
     fetch(`${config.faucetApi}/assets`)
@@ -35,10 +42,16 @@ export const ComboBox = () => {
 
   return (
     <Autocomplete
-      disablePortal
       id="combo-box-demo"
-      options={tokens}
-      getOptionLabel={(option) => option.name}
+      options={tokens.map((token) => token.name)}
+      value={tokenName}
+      onChange={(event: any, newValue) => {
+        setTokenName(newValue);
+      }}
+      inputValue={inputValue}
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue);
+      }}
       sx={{
         width: "100%",
         backgroundColor: "white",
@@ -51,11 +64,43 @@ export const ComboBox = () => {
 };
 
 export default function BasicCard() {
+  const [tokenName, setTokenName] = React.useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = React.useState<string>("");
+  const [response, setResponse] = React.useState<string>("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTokenName("");
+    setWalletAddress("");
+
+    fetch(`${config.faucetApi}/request`, {
+      method: "POST",
+      body: JSON.stringify({ asset: tokenName, address: walletAddress }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        console.log(response.reason);
+        setTokenName(null);
+        setWalletAddress("");
+        setResponse(JSON.stringify(response));
+      })
+      .catch((error) => console.error("Error:", error));
+  };
+
+  const handleWalletAddress = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setWalletAddress(e.target.value);
+  };
+
   return (
     <Card
       sx={{
         width: 500,
-        height: "400px",
+        height: "425px",
         p: "24px",
         background: "hsla(0,0%,100%,.24)",
         border: "1px solid #fff",
@@ -63,7 +108,10 @@ export default function BasicCard() {
         boxShadow: "0 1px 4px rgba(0,0,0,.08)",
       }}
     >
-      <CardContent>
+      <CardContent
+        component="form"
+        onSubmit={(e: React.FormEvent) => handleSubmit(e)}
+      >
         <Typography
           variant="h5"
           component="div"
@@ -90,7 +138,7 @@ export default function BasicCard() {
         >
           Select Token
         </Typography>
-        <ComboBox />
+        <ComboBox tokenName={tokenName} setTokenName={setTokenName} />
         <Typography
           component="div"
           sx={{ fontWeight: 800, fontSize: "1rem", pt: 2, pb: 1 }}
@@ -102,6 +150,9 @@ export default function BasicCard() {
           placeholder="0xxxxxxxxxxxxxxxxxxxxxxxxxxx"
           variant="outlined"
           sx={{ width: "100%", backgroundColor: "white", mb: 3 }}
+          onChange={handleWalletAddress}
+          value={walletAddress}
+          type="text"
         />
         <Button
           variant="contained"
@@ -114,9 +165,20 @@ export default function BasicCard() {
             textTransform: "none",
             height: "56px",
           }}
+          type="submit"
         >
           Submit
         </Button>
+        {response ? (
+          <Typography
+            component="div"
+            sx={{ fontSize: "10px", pb: 1, pt: 1, textAlign: "center" }}
+          >
+            {response}
+          </Typography>
+        ) : (
+          <div></div>
+        )}
       </CardContent>
     </Card>
   );
