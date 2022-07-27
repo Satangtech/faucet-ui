@@ -4,7 +4,7 @@ import ButtonAppBar from "./components/Navber";
 
 function App() {
   return (
-    <div className="App0">
+    <div>
       <header className="App-header">
         <ButtonAppBar />
         <BasicCard />
