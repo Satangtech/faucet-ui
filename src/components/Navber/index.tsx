@@ -3,7 +3,7 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import LogoImg from "../../Firo-logo.svg.png";
+import logo from "../../images/firo-log.png";
 
 export default function ButtonAppBar() {
   return (
@@ -17,7 +17,7 @@ export default function ButtonAppBar() {
               width: "auto",
             }}
             alt="logo"
-            src={LogoImg}
+            src={logo}
           />
           <Typography
             variant="h5"

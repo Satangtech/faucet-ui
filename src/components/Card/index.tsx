@@ -1,23 +1,44 @@
-import * as React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import config from "../../config/app";
+import { useState, useEffect } from "react";
 
-const top3Tokens = [
-  { label: "FVM", address: "0xxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { label: "USDT", address: "0xxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { label: "NXC", address: "0xxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-];
+interface Token {
+  name: string;
+  balance?: number;
+  logo?: string;
+  address?: string;
+  symbol?: string;
+  error?: string;
+}
 
 export const ComboBox = () => {
+  const [tokens, setTokens] = useState<Token[]>([]);
+
+  useEffect(() => {
+    fetch(`${config.faucetApi}/assets`)
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          console.log("result", result);
+          setTokens(result);
+        },
+        (error) => {
+          console.error("error", error);
+        }
+      );
+  }, []);
+
   return (
     <Autocomplete
       disablePortal
       id="combo-box-demo"
-      options={top3Tokens}
+      options={tokens}
+      getOptionLabel={(option) => option.name}
       sx={{
         width: "100%",
         backgroundColor: "white",
