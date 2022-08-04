@@ -7,6 +7,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import config from "../../config/app";
 import { useState, useEffect } from "react";
+import Alert from "@mui/material/Alert";
 
 interface Token {
   name: string;
@@ -24,7 +25,7 @@ interface TokenName {
 
 export const ComboBox = ({ tokenName, setTokenName }: TokenName) => {
   const [tokens, setTokens] = useState<Token[]>([]);
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     fetch(`${config.faucetApi}/assets`)
@@ -36,6 +37,7 @@ export const ComboBox = ({ tokenName, setTokenName }: TokenName) => {
         },
         (error) => {
           console.error("error", error);
+          setTokens([]);
         }
       );
   }, []);
@@ -64,9 +66,9 @@ export const ComboBox = ({ tokenName, setTokenName }: TokenName) => {
 };
 
 export default function BasicCard() {
-  const [tokenName, setTokenName] = React.useState<string | null>(null);
-  const [walletAddress, setWalletAddress] = React.useState<string>("");
-  const [response, setResponse] = React.useState<string>("");
+  const [tokenName, setTokenName] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [response, setResponse] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,89 +99,101 @@ export default function BasicCard() {
   };
 
   return (
-    <Card
-      sx={{
-        width: 500,
-        height: "425px",
-        p: "24px",
-        background: "hsla(0,0%,100%,.24)",
-        border: "1px solid #fff",
-        borderRadius: "12px",
-        boxShadow: "0 1px 4px rgba(0,0,0,.08)",
-      }}
-    >
-      <CardContent
-        component="form"
-        onSubmit={(e: React.FormEvent) => handleSubmit(e)}
+    <Typography component="div">
+      <Card
+        sx={{
+          width: 500,
+          height: "400px",
+          p: "24px",
+          background: "hsla(0,0%,100%,.24)",
+          border: "1px solid #fff",
+          borderRadius: "12px",
+          boxShadow: "0 1px 4px rgba(0,0,0,.08)",
+        }}
       >
-        <Typography
-          variant="h5"
-          component="div"
-          sx={{ fontWeight: 800, fontSize: "24px" }}
+        <CardContent
+          component="form"
+          onSubmit={(e: React.FormEvent) => handleSubmit(e)}
         >
-          Get Test Tokens
-        </Typography>
-        <Typography
-          component="p"
-          sx={{
-            pt: 1,
-            pb: 4,
-            fontSize: "12px",
-            fontWeight: "400px",
-            width: 300,
-          }}
-        >
-          This faucet transfers TestToken on Firo testnets and parent chain.
-          Confirm details before submitting.
-        </Typography>
-        <Typography
-          component="div"
-          sx={{ fontWeight: 800, fontSize: "1rem", pb: 1 }}
-        >
-          Select Token
-        </Typography>
-        <ComboBox tokenName={tokenName} setTokenName={setTokenName} />
-        <Typography
-          component="div"
-          sx={{ fontWeight: 800, fontSize: "1rem", pt: 2, pb: 1 }}
-        >
-          Wallet Address
-        </Typography>
-        <TextField
-          id="outlined-basic"
-          placeholder="0xxxxxxxxxxxxxxxxxxxxxxxxxxx"
-          variant="outlined"
-          sx={{ width: "100%", backgroundColor: "white", mb: 3 }}
-          onChange={handleWalletAddress}
-          value={walletAddress}
-          type="text"
-        />
-        <Button
-          variant="contained"
-          style={{
-            borderRadius: "8px",
-            backgroundColor: "#854ce6",
-            padding: "10px 14px",
-            fontSize: "1rem",
-            width: "100%",
-            textTransform: "none",
-            height: "56px",
-          }}
-          type="submit"
-        >
-          Submit
-        </Button>
-        {response ? (
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{ fontWeight: 800, fontSize: "24px" }}
+          >
+            Get Test Tokens
+          </Typography>
+          <Typography
+            component="p"
+            sx={{
+              pt: 1,
+              pb: 4,
+              fontSize: "12px",
+              fontWeight: "400px",
+              width: 300,
+            }}
+          >
+            This faucet transfers TestToken on Firo testnets and parent chain.
+            Confirm details before submitting.
+          </Typography>
           <Typography
             component="div"
-            sx={{ fontSize: "10px", pb: 1, pt: 1, textAlign: "center" }}
+            sx={{ fontWeight: 800, fontSize: "1rem", pb: 1 }}
           >
-            {response}
+            Select Token
           </Typography>
-        ) : (
-          <Typography component="div"></Typography>
-        )}
-      </CardContent>
-    </Card>
+          <ComboBox tokenName={tokenName} setTokenName={setTokenName} />
+          <Typography
+            component="div"
+            sx={{ fontWeight: 800, fontSize: "1rem", pt: 2, pb: 1 }}
+          >
+            Wallet Address
+          </Typography>
+          <TextField
+            id="outlined-basic"
+            placeholder="0xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            variant="outlined"
+            sx={{ width: "100%", backgroundColor: "white", mb: 3 }}
+            onChange={handleWalletAddress}
+            value={walletAddress}
+            type="text"
+          />
+          <Button
+            variant="contained"
+            style={{
+              borderRadius: "8px",
+              backgroundColor: "#854ce6",
+              padding: "10px 14px",
+              fontSize: "1rem",
+              width: "100%",
+              textTransform: "none",
+              height: "56px",
+            }}
+            type="submit"
+          >
+            Submit
+          </Button>
+        </CardContent>
+      </Card>
+      {response ? (
+        <Alert
+          sx={{
+            fontSize: "12px",
+            width: 500,
+            pb: 1,
+            pt: 1,
+            mt: 1,
+            mx: "auto",
+            textAlign: "center",
+            alignItems: "center",
+            borderRadius: "12px",
+          }}
+          severity={JSON.parse(response).tx ? "success" : "error"}
+        >
+          {response}
+        </Alert>
+      ) : (
+        <Typography component="div"></Typography>
+      )}
+    </Typography>
   );
 }
