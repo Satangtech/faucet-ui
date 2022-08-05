@@ -33,7 +33,7 @@ export const ComboBox = ({ tokenName, setTokenName }: TokenName) => {
       .then(
         (result) => {
           console.log("result", result);
-          setTokens(result);
+          result.message ? setTokens([]) : setTokens(result);
         },
         (error) => {
           console.error("error", error);
@@ -99,7 +99,7 @@ export default function BasicCard() {
   };
 
   return (
-    <Typography component="div">
+    <>
       <Card
         sx={{
           width: 500,
@@ -192,8 +192,8 @@ export default function BasicCard() {
           {response}
         </Alert>
       ) : (
-        <Typography component="div"></Typography>
+        <></>
       )}
-    </Typography>
+    </>
   );
 }
